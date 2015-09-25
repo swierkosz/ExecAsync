@@ -1,4 +1,4 @@
-package oss.swierkosz.execasync;
+package com.github.swierkosz.execasync;
 
 /*
  * Copyright 2015 the original author or authors.
@@ -16,9 +16,9 @@ package oss.swierkosz.execasync;
  * limitations under the License.
  */
 
-public class WebApplicationTimeoutException extends RuntimeException {
+public class WebApplicationIsAlreadyAvailableException extends RuntimeException {
 
-    public WebApplicationTimeoutException(String url) {
-        super("The application is not available at " + url);
+    public WebApplicationIsAlreadyAvailableException(String url) {
+        super("The application is already available at " + url);
     }
 }

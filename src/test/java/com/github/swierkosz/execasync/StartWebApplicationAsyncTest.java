@@ -1,4 +1,4 @@
-package oss.swierkosz.execasync;
+package com.github.swierkosz.execasync;
 
 /*
  * Copyright 2015 the original author or authors.

@@ -1,4 +1,4 @@
-package oss.swierkosz.execasync;
+package com.github.swierkosz.execasync;
 
 /*
  * This file is heavily based on org.gradle.api.tasks.AbstractExecTask.

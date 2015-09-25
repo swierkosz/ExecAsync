@@ -7,7 +7,7 @@ Add to your build.gradle file with the following snippet
 ```
 buildscript {
     dependencies {
-        classpath group: 'oss.swierkosz:ExecAsync'
+        classpath group: 'com.github.swierkosz:ExecAsync'
     }
 }
 ```
@@ -20,7 +20,7 @@ There are two tasks available:
 This task executes a process in the background. Parameters for starting a process are the same as for Gradle's [Exec].
 
 ```
-task(startApp, type: oss.swierkosz.execasync.StartWebApplicationAsync) {
+task(startApp, type: com.github.swierkosz.execasync.StartApplicationAsync) {
     commandLine "my-web-server", "--port=1234"
 }
 ```
@@ -39,7 +39,7 @@ Additional parameters:
 * `failIfAlreadyRunning` - indicates whether the task should fail if process is already running; true is the default
 
 ```
-task(startAppForTesting, type: oss.swierkosz.execasync.StartWebApplicationAsync) {
+task(startAppForTesting, type: com.github.swierkosz.execasync.StartWebApplicationAsync) {
     commandLine "my-web-server", "--port=1234"
     applicationUrl "http://localhost:1234"
     timeout 60
