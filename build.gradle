@@ -1,8 +1,9 @@
-group 'oss.swierkosz'
-version '1.0-SNAPSHOT'
+group "com.github.swierkosz"
+version "1.0.0-SNAPSHOT"
 
-apply plugin: 'java'
-apply plugin: 'maven'
+apply plugin: "java"
+apply plugin: "maven"
+apply plugin: "signing"
 
 repositories {
     mavenCentral()
@@ -11,15 +12,87 @@ repositories {
 uploadArchives {
     repositories {
         mavenDeployer {
-            mavenLocal()
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name "ExecAsync"
+                packaging "jar"
+                description "A simple Gradle plugin for starting processes asynchronously."
+                url "http://www.example.com/example-application"
+
+                scm {
+                    connection "scm:git:https://github.com/swierkosz/ExecAsync.git"
+                    developerConnection "scm:git:https://github.com/swierkosz/ExecAsync.git"
+                    url "https://github.com/swierkosz/ExecAsync"
+                }
+
+                licenses {
+                    license {
+                        name "The Apache License, Version 2.0"
+                        url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+
+                developers {
+                    developer {
+                        id "swierkosz"
+                        name "Szymon Świerkosz"
+                        email "szymek@adres.pl"
+                    }
+                }
+            }
         }
     }
 }
-
 dependencies {
     compile gradleApi()
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-all:2.0.2-beta'
-    testCompile 'org.assertj:assertj-core:2.2.0'
-    testCompile 'com.google.guava:guava:18.0'
+    testCompile "junit:junit:4.12"
+    testCompile "org.mockito:mockito-all:2.0.2-beta"
+    testCompile "org.assertj:assertj-core:2.2.0"
+    testCompile "com.google.guava:guava:18.0"
+}
+
+task javadocJar(type: Jar) {
+    classifier = "javadoc"
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        Console console = System.console()
+
+        if (!project.hasProperty("signing.keyId")) {
+            def id = console.readLine("PGP Key Id: ")
+            allprojects { ext."signing.keyId" = id }
+        }
+        if (!project.hasProperty("signing.secretKeyRingFile")) {
+            def file = console.readLine("PGP Secret Key Ring File (absolute path): ")
+            allprojects { ext."signing.secretKeyRingFile" = file }
+        }
+        if (!project.hasProperty("signing.password")) {
+            def password = console.readPassword("PGP Private Key Password: ")
+            allprojects { ext."signing.password" = password }
+        }
+    }
 }
