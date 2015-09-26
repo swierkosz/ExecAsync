@@ -7,7 +7,7 @@ Add to your build.gradle file with the following snippet
 ```
 buildscript {
     dependencies {
-        classpath group: 'com.github.swierkosz:ExecAsync'
+        classpath "com.github.swierkosz:ExecAsync:1.0.0"
     }
 }
 ```
