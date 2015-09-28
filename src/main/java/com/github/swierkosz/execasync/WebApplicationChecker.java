@@ -24,23 +24,23 @@ public class WebApplicationChecker {
 
     private static final int ATTEMPT_TIMEOUT = 5000;
 
-    public boolean isUrlAccessible(String url) {
+    public boolean isUrlAccessible(String url, int expectedResponseCode) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setConnectTimeout(ATTEMPT_TIMEOUT);
             connection.setReadTimeout(ATTEMPT_TIMEOUT);
             connection.setRequestMethod("GET");
-            return 200 == connection.getResponseCode();
+            return expectedResponseCode == connection.getResponseCode();
         } catch (IOException ignored) {
             return false;
         }
     }
 
-    public boolean waitForUrlToBeAccessible(String url, int timeout) {
+    public boolean waitForUrlToBeAccessible(String url, int expectedResponseCode, int timeout) {
         long deadline = System.nanoTime() + (1000000000L * timeout);
 
         for (; ; ) {
-            if (isUrlAccessible(url)) {
+            if (isUrlAccessible(url, expectedResponseCode)) {
                 return true;
             } else if (System.nanoTime() < deadline) {
                 try {

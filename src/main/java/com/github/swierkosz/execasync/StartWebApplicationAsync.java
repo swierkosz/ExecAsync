@@ -25,11 +25,14 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
 
     private String applicationUrl;
     private int timeout = 300;
+    private int expectedResponseCode = 200;
     private boolean failIfAlreadyRunning = true;
     private WebApplicationChecker checker = new WebApplicationChecker();
 
     /**
      * Returns the application url used for checking whether application has started.
+     *
+     * @return url as String
      */
     public String getApplicationUrl() {
         return applicationUrl;
@@ -63,7 +66,27 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
     }
 
     /**
+     * Returns the expected response code which will identify the web application as ready.
+     *
+     * @return expected HTTP status code
+     */
+    public int getExpectedResponseCode() {
+        return expectedResponseCode;
+    }
+
+    /**
+     * Sets the expected response code which will identify the web application as ready.
+     *
+     * @param expectedResponseCode expected HTTP status code
+     */
+    public void setExpectedResponseCode(int expectedResponseCode) {
+        this.expectedResponseCode = expectedResponseCode;
+    }
+
+    /**
      * Returns true when task should fail when application is already running.
+     *
+     * @return true if task will fail for already running application
      */
     public boolean isFailIfAlreadyRunning() {
         return failIfAlreadyRunning;
@@ -71,6 +94,8 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
 
     /**
      * Controls whether task should fail when application is already running.
+     *
+     * @param failIfAlreadyRunning set to true if task should fail for already running application
      */
     public void setFailIfAlreadyRunning(boolean failIfAlreadyRunning) {
         this.failIfAlreadyRunning = failIfAlreadyRunning;
@@ -78,7 +103,7 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
 
     @Override
     protected void exec() {
-        if (checker.isUrlAccessible(applicationUrl)) {
+        if (checker.isUrlAccessible(applicationUrl, expectedResponseCode)) {
             if (failIfAlreadyRunning) {
                 throw new WebApplicationIsAlreadyAvailableException(applicationUrl);
             } else {
@@ -91,7 +116,7 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
         super.exec();
 
         LOGGER.info("Waiting for the application url " + applicationUrl + " to become available...");
-        if (checker.waitForUrlToBeAccessible(applicationUrl, timeout)) {
+        if (checker.waitForUrlToBeAccessible(applicationUrl, expectedResponseCode, timeout)) {
             LOGGER.info("The application url " + applicationUrl + " is now accessible");
         } else {
             throw new WebApplicationTimeoutException(applicationUrl);

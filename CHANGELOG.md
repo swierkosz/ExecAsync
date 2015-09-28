@@ -1,4 +1,5 @@
-# 1.0.1
+# 1.1.0
+* Added expectedResponseCode parameter
 * Compiled using Java 7
 * Fixed README examples
 

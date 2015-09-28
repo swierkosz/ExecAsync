@@ -7,7 +7,7 @@ Add to your build.gradle file with the following snippet
 ```
 buildscript {
     dependencies {
-        classpath "com.github.swierkosz:ExecAsync:1.0.0"
+        classpath "com.github.swierkosz:ExecAsync:1.1.0"
     }
 }
 ```
@@ -35,6 +35,7 @@ This task is an extension to StartApplicationAsync - waits for the specified URL
 
 Additional parameters:
 * `applicationUrl` - a URL of the web application that is to be started
+* `expectedResponseCode` - an expected HTTP status code that will identify the application as ready; 200 is the default
 * `timeout` - a number of seconds to wait for process to start, an exception will be thrown unless process started; 300 is the default
 * `failIfAlreadyRunning` - indicates whether the task should fail if process is already running; true is the default
 
@@ -42,6 +43,7 @@ Additional parameters:
 task(startAppForTesting, type: com.github.swierkosz.execasync.StartWebApplicationAsync) {
     commandLine "my-web-server", "--port=1234"
     applicationUrl "http://localhost:1234"
+    expectedResponseCode 302
     timeout 60
 }
 ```

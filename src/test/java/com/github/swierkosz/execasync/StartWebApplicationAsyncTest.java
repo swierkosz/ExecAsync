@@ -82,10 +82,32 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
     @Test
     public void shouldReturnDefaultTimeout() {
         // When
-        long result = task.getTimeout();
+        int result = task.getTimeout();
 
         // Then
-        assertThat(result).isEqualTo(300L);
+        assertThat(result).isEqualTo(300);
+    }
+
+    @Test
+    public void shouldSetAndReturnExpectedResponseCode() {
+        // Given
+        int expectedResponseCode = 401;
+
+        // When
+        task.setExpectedResponseCode(expectedResponseCode);
+        int result = task.getExpectedResponseCode();
+
+        // Then
+        assertThat(result).isEqualTo(expectedResponseCode);
+    }
+
+    @Test
+    public void shouldReturnDefaultExpectedResponseCode() {
+        // When
+        int result = task.getExpectedResponseCode();
+
+        // Then
+        assertThat(result).isEqualTo(200);
     }
 
     @Test
@@ -105,9 +127,13 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
     public void shouldThrowErrorIfApplicationIsAlreadyRunning() {
         // Given
         String url = "http://test.test";
+        int expectedResponseCode = 201;
+
         task.setApplicationUrl(url);
+        task.setExpectedResponseCode(expectedResponseCode);
         task.setFailIfAlreadyRunning(true);
-        given(checker.isUrlAccessible(url)).willReturn(true);
+
+        given(checker.isUrlAccessible(url, expectedResponseCode)).willReturn(true);
 
         // When
         task.exec();
@@ -117,9 +143,13 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
     public void shouldNotStartProcessIfApplicationIsAlreadyRunningAndShouldNotFail() {
         // Given
         String url = "http://test.test";
+        int expectedResponseCode = 201;
+
         task.setApplicationUrl(url);
+        task.setExpectedResponseCode(expectedResponseCode);
         task.setFailIfAlreadyRunning(false);
-        given(checker.isUrlAccessible(url)).willReturn(true);
+
+        given(checker.isUrlAccessible(url, expectedResponseCode)).willReturn(true);
 
         // When
         task.exec();
@@ -132,10 +162,14 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
     public void shouldStartProcessIfApplicationIsNotRunningAndShouldWait() {
         // Given
         String url = "http://test.test";
-        task.setApplicationUrl(url);
+        int expectedResponseCode = 201;
         int timeout = 123;
+
+        task.setApplicationUrl(url);
+        task.setExpectedResponseCode(expectedResponseCode);
         task.setTimeout(timeout);
-        given(checker.waitForUrlToBeAccessible(url, timeout)).willReturn(true);
+
+        given(checker.waitForUrlToBeAccessible(url, expectedResponseCode, timeout)).willReturn(true);
 
         // When
         task.exec();
@@ -143,7 +177,7 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
         // Then
         InOrder inOrder = inOrder(execHandleBuilder, checker);
         inOrder.verify(execHandleBuilder).build();
-        inOrder.verify(checker).waitForUrlToBeAccessible(url, timeout);
+        inOrder.verify(checker).waitForUrlToBeAccessible(url, expectedResponseCode, timeout);
     }
 
     @Test(expected = WebApplicationTimeoutException.class)
