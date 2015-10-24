@@ -16,6 +16,9 @@ package com.github.swierkosz.execasync;
  * limitations under the License.
  */
 
+import com.github.swierkosz.execasync.web.WebApplicationChecker;
+import com.github.swierkosz.execasync.web.WebApplicationIsAlreadyAvailableException;
+import com.github.swierkosz.execasync.web.WebApplicationTimeoutException;
 import org.gradle.process.internal.ExecHandle;
 import org.gradle.process.internal.ExecHandleBuilder;
 import org.junit.Before;

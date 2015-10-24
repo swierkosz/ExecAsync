@@ -16,6 +16,9 @@ package com.github.swierkosz.execasync;
  * limitations under the License.
  */
 
+import com.github.swierkosz.execasync.web.WebApplicationChecker;
+import com.github.swierkosz.execasync.web.WebApplicationIsAlreadyAvailableException;
+import com.github.swierkosz.execasync.web.WebApplicationTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
