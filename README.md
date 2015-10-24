@@ -7,14 +7,15 @@ Add to your build.gradle file with the following snippet
 ```
 buildscript {
     dependencies {
-        classpath "com.github.swierkosz:ExecAsync:1.1.0"
+        classpath "com.github.swierkosz:ExecAsync:1.2.0"
     }
 }
 ```
 ## Available tasks
-There are two tasks available:
+There are three tasks available:
 * StartApplicationAsync - a task for executing a process in the background
 * StartWebApplicationAsync - an extension to StartApplicationAsync that waits for URL to become available
+* StartConsoleApplicationAsync - an extension to StartApplicationAsync that waits for the specified pattern to match against console output
 
 ### StartApplicationAsync
 This task executes a process in the background. Parameters for starting a process are the same as for Gradle's [Exec].
@@ -44,6 +45,21 @@ task(startAppForTesting, type: com.github.swierkosz.execasync.StartWebApplicatio
     commandLine "my-web-server", "--port=1234"
     applicationUrl "http://localhost:1234"
     expectedResponseCode 302
+    timeout 60
+}
+```
+
+### StartConsoleApplicationAsync
+This task is an extension to StartApplicationAsync - waits for the specified pattern to match against console output
+
+Additional parameters:
+* `pattern` - a regular expression to be used against console output to check whether application is ready or not
+* `timeout` - a number of seconds to wait for process to start, an exception will be thrown unless process started; 300 is the default
+
+```
+task(startAppForTesting, type: com.github.swierkosz.execasync.StartConsoleApplicationAsync) {
+    commandLine "my-web-server", "--port=1234"
+    pattern "Application has started in \\d+ seconds"
     timeout 60
 }
 ```
