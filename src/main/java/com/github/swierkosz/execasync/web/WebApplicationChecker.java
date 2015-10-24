@@ -19,6 +19,10 @@ package com.github.swierkosz.execasync.web;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.Callable;
+
+import static com.jayway.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WebApplicationChecker {
 
@@ -36,21 +40,17 @@ public class WebApplicationChecker {
         }
     }
 
-    public boolean waitForUrlToBeAccessible(String url, int expectedResponseCode, int timeout) {
-        long deadline = System.nanoTime() + (1000000000L * timeout);
-
-        for (; ; ) {
-            if (isUrlAccessible(url, expectedResponseCode)) {
-                return true;
-            } else if (System.nanoTime() < deadline) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ignored) {
-                    return false;
+    public boolean waitForUrlToBeAccessible(final String url, final int expectedResponseCode, int timeout) {
+        try {
+            await().atMost(timeout, SECONDS).until(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return isUrlAccessible(url, expectedResponseCode);
                 }
-            } else {
-                return false;
-            }
+            });
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
