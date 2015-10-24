@@ -16,21 +16,25 @@ package com.github.swierkosz.execasync;
  * limitations under the License.
  */
 
+import com.github.swierkosz.execasync.polling.Poller;
 import com.github.swierkosz.execasync.web.WebApplicationChecker;
 import com.github.swierkosz.execasync.web.WebApplicationIsAlreadyAvailableException;
-import com.github.swierkosz.execasync.web.WebApplicationTimeoutException;
 import org.gradle.process.internal.ExecHandle;
 import org.gradle.process.internal.ExecHandleBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,6 +49,9 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
     @Mock
     private ExecHandle execHandle;
 
+    @Mock
+    private Poller poller;
+
     private StartWebApplicationAsync task;
 
     @Before
@@ -52,6 +59,7 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
         task = createTask(StartWebApplicationAsync.class);
         task.setChecker(checker);
         task.setExecHandleBuilder(execHandleBuilder);
+        task.setPoller(poller);
 
         given(execHandleBuilder.build()).willReturn(execHandle);
     }
@@ -67,28 +75,6 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
 
         // Then
         assertThat(result).isEqualTo(url);
-    }
-
-    @Test
-    public void shouldSetAndReturnTimeout() {
-        // Given
-        int timeout = 123456;
-
-        // When
-        task.setTimeout(timeout);
-        int result = task.getTimeout();
-
-        // Then
-        assertThat(result).isEqualTo(timeout);
-    }
-
-    @Test
-    public void shouldReturnDefaultTimeout() {
-        // When
-        int result = task.getTimeout();
-
-        // Then
-        assertThat(result).isEqualTo(300);
     }
 
     @Test
@@ -172,24 +158,30 @@ public class StartWebApplicationAsyncTest extends AbstractTaskTest {
         task.setExpectedResponseCode(expectedResponseCode);
         task.setTimeout(timeout);
 
-        given(checker.waitForUrlToBeAccessible(url, expectedResponseCode, timeout)).willReturn(true);
-
         // When
         task.exec();
 
         // Then
-        InOrder inOrder = inOrder(execHandleBuilder, checker);
-        inOrder.verify(execHandleBuilder).build();
-        inOrder.verify(checker).waitForUrlToBeAccessible(url, expectedResponseCode, timeout);
+        verify(execHandleBuilder).build();
+        verify(poller).awaitAtMost(anyInt(), any(TimeUnit.class), any(Callable.class));
     }
 
-    @Test(expected = WebApplicationTimeoutException.class)
-    public void shouldThrowExceptionIfApplicationIsNotAvailable() {
+    @Test
+    public void shouldCheckIfApplicationIsReady() {
         // Given
         String url = "http://test.test";
+        int expectedResponseCode = 201;
+
         task.setApplicationUrl(url);
+        task.setExpectedResponseCode(expectedResponseCode);
+
+        given(checker.isUrlAccessible(url, expectedResponseCode)).willReturn(true);
 
         // When
-        task.exec();
+        boolean result = task.isApplicationReady();
+
+        // Then
+        assertThat(result).isTrue();
     }
+
 }

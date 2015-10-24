@@ -18,19 +18,21 @@ package com.github.swierkosz.execasync;
 
 import com.github.swierkosz.execasync.web.WebApplicationChecker;
 import com.github.swierkosz.execasync.web.WebApplicationIsAlreadyAvailableException;
-import com.github.swierkosz.execasync.web.WebApplicationTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StartWebApplicationAsync extends StartApplicationAsync {
+public class StartWebApplicationAsync extends AbstractPollingExecAsyncTask<StartWebApplicationAsync> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartWebApplicationAsync.class);
 
     private String applicationUrl;
-    private int timeout = 300;
     private int expectedResponseCode = 200;
     private boolean failIfAlreadyRunning = true;
     private WebApplicationChecker checker = new WebApplicationChecker();
+
+    public StartWebApplicationAsync() {
+        super(StartWebApplicationAsync.class);
+    }
 
     /**
      * Returns the application url used for checking whether application has started.
@@ -48,24 +50,6 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
      */
     public void setApplicationUrl(String applicationUrl) {
         this.applicationUrl = applicationUrl;
-    }
-
-    /**
-     * Returns the timeout for application startup.
-     *
-     * @return duration in seconds
-     */
-    public int getTimeout() {
-        return timeout;
-    }
-
-    /**
-     * Sets the timeout for application startup.
-     *
-     * @param timeout duration in seconds
-     */
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
     }
 
     /**
@@ -117,13 +101,11 @@ public class StartWebApplicationAsync extends StartApplicationAsync {
 
         LOGGER.info("Application url " + applicationUrl + " is not already accessible, starting the application...");
         super.exec();
+    }
 
-        LOGGER.info("Waiting for the application url " + applicationUrl + " to become available...");
-        if (checker.waitForUrlToBeAccessible(applicationUrl, expectedResponseCode, timeout)) {
-            LOGGER.info("The application url " + applicationUrl + " is now accessible");
-        } else {
-            throw new WebApplicationTimeoutException(applicationUrl);
-        }
+    @Override
+    protected boolean isApplicationReady() {
+        return checker.isUrlAccessible(applicationUrl, expectedResponseCode);
     }
 
     protected void setChecker(WebApplicationChecker checker) {

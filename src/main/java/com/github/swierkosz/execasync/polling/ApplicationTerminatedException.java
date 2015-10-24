@@ -1,4 +1,4 @@
-package com.github.swierkosz.execasync.web;
+package com.github.swierkosz.execasync.polling;
 
 /*
  * Copyright 2015 the original author or authors.
@@ -16,9 +16,9 @@ package com.github.swierkosz.execasync.web;
  * limitations under the License.
  */
 
-public class WebApplicationTimeoutException extends RuntimeException {
+public class ApplicationTerminatedException extends RuntimeException {
 
-    public WebApplicationTimeoutException(String url) {
-        super("The application is not available at " + url);
+    public ApplicationTerminatedException() {
+        super("The application is longer running");
     }
 }

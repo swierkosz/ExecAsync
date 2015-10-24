@@ -19,10 +19,6 @@ package com.github.swierkosz.execasync.web;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.Callable;
-
-import static com.jayway.awaitility.Awaitility.await;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class WebApplicationChecker {
 
@@ -40,17 +36,4 @@ public class WebApplicationChecker {
         }
     }
 
-    public boolean waitForUrlToBeAccessible(final String url, final int expectedResponseCode, int timeout) {
-        try {
-            await().atMost(timeout, SECONDS).until(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    return isUrlAccessible(url, expectedResponseCode);
-                }
-            });
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

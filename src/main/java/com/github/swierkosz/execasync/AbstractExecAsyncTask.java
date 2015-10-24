@@ -57,7 +57,7 @@ public abstract class AbstractExecAsyncTask<T extends AbstractExecAsyncTask> ext
     }
 
     /**
-     * Starts process, blocking until the process has started.
+     * Starts process.
      */
     @TaskAction
     protected void exec() {
