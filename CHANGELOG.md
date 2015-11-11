@@ -1,3 +1,6 @@
+# master
+* Fixed messages
+
 # 1.2.0
 * Added new task StartConsoleApplicationAsync
 * Improved StartWebApplicationAsync not to wait if application is no longer running

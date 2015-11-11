@@ -72,7 +72,7 @@ public abstract class AbstractPollingExecAsyncTask<T extends AbstractPollingExec
                 return isApplicationReady();
             }
         });
-        LOGGER.info("The application url is now available");
+        LOGGER.info("The application is now available");
     }
 
     protected abstract boolean isApplicationReady();
