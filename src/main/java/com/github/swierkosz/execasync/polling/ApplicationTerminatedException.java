@@ -19,6 +19,6 @@ package com.github.swierkosz.execasync.polling;
 public class ApplicationTerminatedException extends RuntimeException {
 
     public ApplicationTerminatedException() {
-        super("The application is no longer running");
+        super("The application has exited prematurely");
     }
 }
